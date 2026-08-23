@@ -1,0 +1,4 @@
+--format='html'
+--markup='markdown'
+--no-private
+--output-dir='./docs'
