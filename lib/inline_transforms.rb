@@ -42,7 +42,7 @@ module InlineTransforms
   #   A hash of keys to case-compare against `self` so we can return the corresponding value.
   #
   # @option else: [Object]
-  #   The fallback value to return if no matching key is found.
+  #   The fallback value to return if no matching key is found. Defaults to `nil`.
   #
   # @return
   #   Returns either `self`, one of the transformation hash values, or the `else:` option.

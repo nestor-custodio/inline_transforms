@@ -99,6 +99,8 @@ final = value.transform key_1 => value_1,
 
 ## Potential Gotchas
 
+- Because `else:` has special meaning, `transform` cannot check for the original value being the literal `Symbol` `:else`.
+
 - `Proc` instances are only resolved if they _need to be returned and are not the original value_:
   ```ruby
   value = -> { 'value proc' }
