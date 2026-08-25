@@ -1,12 +1,36 @@
 require_relative 'inline_transforms/version'
 
-# Defines `unless` and `transform`, which we'll then want to make available in `Object` instances.
+# Defines `only_if`, `unless`, and `transform`, which we'll then want to make available in `Object` instances.
 #
 module InlineTransforms
   # Our use of case equality in matching bad/target values
   # is intentional and part of the promise behind the gem.
   #
   # rubocop:disable Style/CaseEquality
+
+  # Returns `self` _only if_ it matches a "good" value; otherwise returns an alternate (`else:`) value.
+  #
+  # (NOTE: this takes an `else: nil` named param, but is defined as taking `(**options)` because `else` is reserved.)
+  #
+  #
+  # @param good_value [Object]
+  #   The one value we consider "good", and for which we'd like `self` returned.
+  #
+  # @option else: [Object]
+  #   The value we'd like back if `self` does not match the `good_value` **using case comparison**.
+  #   Defaults to `nil`.
+  #
+  # @return
+  #   Returns either `self` or the value given as the `else:` option.
+  #
+  def only_if(good_value, **options)
+    return self if inline_transforms_equality? good_value
+
+    alt_value = options[:else]
+    return alt_value.call if alt_value.is_a? Proc
+
+    alt_value
+  end
 
   # Returns `self` ... unless it matches a "bad" value, in which case it returns an alternate (`then:`) value.
   #

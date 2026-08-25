@@ -1,4 +1,39 @@
 RSpec.describe Object do
+  describe '#only_if' do
+    test_values = [nil, true, false, 99, :symbol, 'string', ['array'], { key: 'value' }, -> { puts 'value proc' }]
+    safe_bad_value = 'something not present in the `test_values` list'
+    replacement_value = 'some different value'
+
+    it 'is available' do
+      expect(Object).to respond_to(:only_if)
+    end
+
+    it 'takes the proper arguments' do
+      expect(Object).to respond_to(:only_if).with(1).arguments.with_any_keywords
+    end
+
+    it 'passes "good" values unaltered' do
+      test_values.each { |value| expect(value.only_if(value)).to eq value }
+    end
+
+    it 'replaces "bad" values with the `else` param' do
+      test_values.each do |value|
+        expect(value.only_if(safe_bad_value, else: replacement_value)).to eq replacement_value
+      end
+    end
+
+    it %(`call`s the `else` param before use if it's a Proc) do
+      @rand_value = rand 1..10000
+      replacement_proc = -> { @rand_value }
+
+      test_values.each do |value|
+        expect(value.only_if(safe_bad_value, else: replacement_proc)).to eq @rand_value
+      end
+    end
+  end
+
+  # ---
+
   describe '#unless' do
     test_values = [nil, true, false, 99, :symbol, 'string', ['array'], { key: 'value' }, -> { puts 'value proc' }]
     safe_bad_value = 'something not present in the `test_values` list'
@@ -39,6 +74,8 @@ RSpec.describe Object do
       end
     end
   end
+
+  # ---
 
   describe '#transform' do
     value = 'some value'

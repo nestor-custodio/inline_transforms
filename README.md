@@ -8,6 +8,25 @@ Ruby is an incredibly expressive (and easy to read!) language, but lacks a way f
 
 In simplest terms:
 ```ruby
+# "Only If" Logic:
+
+final_value = original_value
+final_value = different_value unless original_value == a_good_thing
+
+# ... or ...
+
+final_value = if original_value == a_good_thing
+                original_value
+              else
+                different_value
+              end
+
+# ... becomes ...
+
+final_value = original_value.only_if a_good_thing,
+                                     else: different_value
+```
+```ruby
 # "Unless" Logic:
 
 final_value = original_value
@@ -25,8 +44,8 @@ final_value = if original_value == a_bad_thing
 
 final_value = original_value.unless a_bad_thing,
                                     then: different_value
-
-
+```
+```ruby
 # "Transform" Logic:
 
 final_value = case original_value
@@ -40,7 +59,6 @@ final_value = case original_value
 final_value = original_value.transform true   => 'success',
                                        false  => 'failure',
                                        String => %(error: "#{original_value}")
-
 ```
 
 [Full documentation is available here](https://nestor-custodio.github.io/inline_transforms), but do read below for a crash course on availble featues!
@@ -67,6 +85,20 @@ final_value = original_value.transform true   => 'success',
 
 
 ## Usage
+
+### Object#only_if
+
+`only_if` lets you specify a "good" value and an `else` replacement.
+
+- If your `else` replacement is a `Proc`, it is resolved (via `call`) before being returned.
+- This method uses **case comparison** (`===`), so you can check for range inclusion or class.
+
+```ruby
+final = value.only_if good_value, else: fallback_value
+# ... or ...
+final = value.only_if good_value, else: -> { some_method_call with_params }
+```
+
 
 ### Object#unless
 
