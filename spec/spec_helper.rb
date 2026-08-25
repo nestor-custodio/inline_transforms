@@ -11,3 +11,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+# ---
+
+require_relative 'no_detail_on_pending_tests'
