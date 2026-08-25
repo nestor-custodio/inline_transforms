@@ -1,35 +1,159 @@
-# InlineTransforms
+[![Gem Version](https://img.shields.io/github/v/release/nestor-custodio/inline_transforms?color=green&label=gem%20version)](https://rubygems.org/gems/inline_transforms)
+[![MIT License](https://img.shields.io/github/license/nestor-custodio/inline_transforms)](https://tldrlegal.com/license/mit-license)
 
-TODO: Delete this and the text below, and describe your gem
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/inline_transforms`. To experiment with that code, run `bin/console` for an interactive prompt.
+# Inline Transforms
+
+Ruby is an incredibly expressive (and easy to read!) language, but lacks a way for you to transform a value _inline_ without resorting to nested ternaries (🫠). This gem allows you to do exactly that in a way that still feels like _Ruby_ (i.e. via _value manipulation_ through method calls rather than classic flow control blocks).
+
+In simplest terms:
+```ruby
+# "Unless" Logic:
+
+final_value = original_value
+final_value = different_value if original_value == a_bad_thing
+
+# ... or ...
+
+final_value = if original_value == a_bad_thing
+                different_value
+              else
+                original_value
+              end
+
+# ... becomes ...
+
+final_value = original_value.unless a_bad_thing,
+                                    then: different_value
+
+
+# "Transform" Logic:
+
+final_value = case original_value
+              when true   then 'success'
+              when false  then 'failure'
+              when String then %(error: "#{original_value}")
+              end
+
+# ... becomes ...
+
+final_value = original_value.transform true   => 'success',
+                                       false  => 'failure',
+                                       String => %(error: "#{original_value}")
+
+```
+
+[Full documentation is available here](https://nestor-custodio.github.io/inline_transforms), but do read below for a crash course on availble featues!
+
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+- If your project uses [Bundler](https://github.com/bundler/bundler):
+  - Add one of the following to your application's Gemfile:
+    ```ruby
+    # For on-demand usage:
 
-Install the gem and add to the application's Gemfile by executing:
+    gem 'inline_transforms'
+    ```
+  - And then run a:
+    ```shell
+    $ bundle install
+    ```
 
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
-```
+- Or, you can keep things simple with a manual install:
+  ```shell
+  $ gem install inline_transforms
+  ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
-```
 
 ## Usage
 
-TODO: Write usage instructions here
+### Object#unless
 
-## Development
+`unless` lets you specify a "bad" value and a `then` replacement.
+
+- If your `then` replacement is a `Proc`, it is resolved (via `call`) before being returned.
+- This method uses **case comparison** (`===`), so you can check for range inclusion or class.
+
+```ruby
+final = value.unless bad_value, then: fallback_value
+# ... or ...
+final = value.unless bad_value, then: -> { some_method_call with_params }
+```
+
+
+### Object#transform
+
+`transform` lets you specify a transformation hash and will return the value for the first matching key, or (if no matching key is found) the `:else` value.
+
+- Any `Proc` values in the transform hash are resolved (via `call`) before being returned.
+- This method uses **case comparison** (`===`), so range and class keys work as you expect.
+
+```ruby
+final = value.transform key_1 => value_1,
+                        key_2 => value_2,
+                        # ...
+                        else: else_value
+```
+
+
+## Potential Gotchas
+
+- `Proc` instances are only resolved if they _need to be returned and are not the original value_:
+  ```ruby
+  value = -> { 'value proc' }
+  replacement_proc = -> { 'replacement proc' }
+
+  # Returns the original `value`, still a *Proc*.
+  #
+  # The original `value` is never resolved.
+  # The `replacement_proc` is not resolved.
+  #
+  final = value.unless 99, then: replacement_proc
+
+  # Returns the *String* 'replacement proc'.
+  #
+  # The original `value` is never resolved.
+  # The `replacement_proc` DOES get resolved.
+  #
+  final = value.unless value, then: replacement_proc
+
+  # Returns 99.
+  #
+  # The original `value` is never resolved.
+  # The `replacement_proc` is not resolved.
+  #
+  final = value.transform value => 99, else: replacement_proc
+
+  # Returns the *String* 'replacement proc'.
+  #
+  # The original `value` is never resolved.
+  # The `replacement_proc` DOES get resolved.
+  #
+  final = value.transform 99 => 99, else: replacement_proc
+  ```
+
+- Because _return_ `Proc`s are resolved before being passed back, you have to "proc-wrap" any `Proc` you want returned as-is (😵‍💫):
+  ```ruby
+  value = 'some value'
+  replacement_proc = -> { 'replacement proc' }
+
+  # Returns the `replacement_proc`, still a *Proc*.
+  #
+  value.unless 99, then: -> { replacement_proc }
+  ```
+  It should be _exceedingly rare_ for someone to want to do this, but it _is_ supported and this is how you would make that happen.
+
+
+## Contribution / Development
+
+Bug reports and pull requests are welcome at: [https://github.com/nestor-custodio/inline_transforms](https://github.com/nestor-custodio/inline_transforms)
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Linting is courtesy of [Rubocop](https://docs.rubocop.org/) (`rake rubocop`) and documentation is built using [YARD](https://yardoc.org/). Please ensure you have a clean bill of health from Rubocop and that any new features and/or changes to behaviour are reflected in the adjacent documentation before submitting a pull request.
 
-## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/inline_transforms.
+## License
+
+The `inline_transforms` gem is available as open source under the terms of the [MIT License](https://tldrlegal.com/license/mit-license).
