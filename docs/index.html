@@ -64,6 +64,24 @@
 <h1 id="Inline_Transforms">Inline Transforms</h1>
 <p>Ruby is an incredibly expressive (and easy to read!) language, but lacks a way for you to transform a value <em>inline</em> without resorting to nested ternaries (🫠). This gem allows you to do exactly that in a way that still feels like <em>Ruby</em> (i.e. via <em>value manipulation</em> through method calls rather than classic flow control blocks).</p>
 <p>In simplest terms:</p>
+<pre class="code ruby"><code class="ruby"><span class='comment'># &quot;Only If&quot; Logic:
+</span>
+<span class='id identifier rubyid_final_value'>final_value</span> <span class='op'>=</span> <span class='id identifier rubyid_original_value'>original_value</span>
+<span class='id identifier rubyid_final_value'>final_value</span> <span class='op'>=</span> <span class='id identifier rubyid_different_value'>different_value</span> <span class='kw'>unless</span> <span class='id identifier rubyid_original_value'>original_value</span> <span class='op'>==</span> <span class='id identifier rubyid_a_good_thing'>a_good_thing</span>
+
+<span class='comment'># ... or ...
+</span>
+<span class='id identifier rubyid_final_value'>final_value</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_original_value'>original_value</span> <span class='op'>==</span> <span class='id identifier rubyid_a_good_thing'>a_good_thing</span>
+                <span class='id identifier rubyid_original_value'>original_value</span>
+              <span class='kw'>else</span>
+                <span class='id identifier rubyid_different_value'>different_value</span>
+              <span class='kw'>end</span>
+
+<span class='comment'># ... becomes ...
+</span>
+<span class='id identifier rubyid_final_value'>final_value</span> <span class='op'>=</span> <span class='id identifier rubyid_original_value'>original_value</span><span class='period'>.</span><span class='id identifier rubyid_only_if'>only_if</span> <span class='id identifier rubyid_a_good_thing'>a_good_thing</span><span class='comma'>,</span>
+                                     <span class='label'>else:</span> <span class='id identifier rubyid_different_value'>different_value</span>
+</code></pre>
 <pre class="code ruby"><code class="ruby"><span class='comment'># &quot;Unless&quot; Logic:
 </span>
 <span class='id identifier rubyid_final_value'>final_value</span> <span class='op'>=</span> <span class='id identifier rubyid_original_value'>original_value</span>
@@ -81,9 +99,8 @@
 </span>
 <span class='id identifier rubyid_final_value'>final_value</span> <span class='op'>=</span> <span class='id identifier rubyid_original_value'>original_value</span><span class='period'>.</span><span class='id identifier rubyid_unless'>unless</span> <span class='id identifier rubyid_a_bad_thing'>a_bad_thing</span><span class='comma'>,</span>
                                     <span class='label'>then:</span> <span class='id identifier rubyid_different_value'>different_value</span>
-
-
-<span class='comment'># &quot;Transform&quot; Logic:
+</code></pre>
+<pre class="code ruby"><code class="ruby"><span class='comment'># &quot;Transform&quot; Logic:
 </span>
 <span class='id identifier rubyid_final_value'>final_value</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_original_value'>original_value</span>
               <span class='kw'>when</span> <span class='kw'>true</span>   <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>success</span><span class='tstring_end'>&#39;</span></span>
@@ -96,7 +113,6 @@
 <span class='id identifier rubyid_final_value'>final_value</span> <span class='op'>=</span> <span class='id identifier rubyid_original_value'>original_value</span><span class='period'>.</span><span class='id identifier rubyid_transform'>transform</span> <span class='kw'>true</span>   <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>success</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                                        <span class='kw'>false</span>  <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>failure</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                                        <span class='const'>String</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>error: &quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_original_value'>original_value</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;</span><span class='tstring_end'>)</span></span>
-
 </code></pre>
 <p><a href="https://nestor-custodio.github.io/inline_transforms">Full documentation is available here</a>, but do read below for a crash course on availble featues!</p>
 <h2 id="Installation">Installation</h2>
@@ -123,6 +139,16 @@
 </li>
 </ul>
 <h2 id="Usage">Usage</h2>
+<h3 id="Object_only_if">Object#only_if</h3>
+<p><code>only_if</code> lets you specify a &quot;good&quot; value and an <code>else</code> replacement.</p>
+<ul>
+<li>If your <code>else</code> replacement is a <code>Proc</code>, it is resolved (via <code>call</code>) before being returned.</li>
+<li>This method uses <strong>case comparison</strong> (<code>===</code>), so you can check for range inclusion or class.</li>
+</ul>
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_final'>final</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_only_if'>only_if</span> <span class='id identifier rubyid_good_value'>good_value</span><span class='comma'>,</span> <span class='label'>else:</span> <span class='id identifier rubyid_fallback_value'>fallback_value</span>
+<span class='comment'># ... or ...
+</span><span class='id identifier rubyid_final'>final</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_only_if'>only_if</span> <span class='id identifier rubyid_good_value'>good_value</span><span class='comma'>,</span> <span class='label'>else:</span> <span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_some_method_call'>some_method_call</span> <span class='id identifier rubyid_with_params'>with_params</span> <span class='rbrace'>}</span>
+</code></pre>
 <h3 id="Object_unless">Object#unless</h3>
 <p><code>unless</code> lets you specify a &quot;bad&quot; value and a <code>then</code> replacement.</p>
 <ul>
@@ -146,6 +172,9 @@
 </code></pre>
 <h2 id="Potential_Gotchas">Potential Gotchas</h2>
 <ul>
+<li>
+<p>Because <code>else:</code> has special meaning, <code>transform</code> cannot check for the original value being the literal <code>Symbol</code> <code>:else</code>.</p>
+</li>
 <li>
 <p><code>Proc</code> instances are only resolved if they <em>need to be returned and are not the original value</em>:</p>
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>value proc</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
@@ -200,7 +229,7 @@
 <p>The <code>inline_transforms</code> gem is available as open source under the terms of the <a href="https://tldrlegal.com/license/mit-license">MIT License</a>.</p></div></div>
 
       <div id="footer">
-  Generated on Tue Aug 25 03:22:27 2026 by
+  Generated on Tue Aug 25 16:11:47 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-3.4.8).
 </div>
