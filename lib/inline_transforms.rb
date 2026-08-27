@@ -26,10 +26,7 @@ module InlineTransforms
   def only_if(good_value, **options)
     return self if inline_transforms_equality? good_value
 
-    alt_value = options[:else]
-    return alt_value.call if alt_value.is_a? Proc
-
-    alt_value
+    inline_transforms_response_processor options[:else]
   end
 
   # Returns `self` ... unless it matches a "bad" value, in which case it returns an alternate (`then:`) value.
@@ -50,10 +47,7 @@ module InlineTransforms
   def unless(bad_value, **options)
     return self unless inline_transforms_equality? bad_value
 
-    alt_value = options[:then]
-    return alt_value.call if alt_value.is_a? Proc
-
-    alt_value
+    inline_transforms_response_processor options[:then]
   end
 
   # Returns `self` ... unless it matches one of the keys in the given "transformation hash", in which case the
@@ -74,8 +68,8 @@ module InlineTransforms
   def transform(**options)
     default = options.delete :else
 
-    options.each { |key, value| return value.unless Proc, then: -> { value.call } if inline_transforms_equality? key }
-    default
+    options.each { |key, value| return inline_transforms_response_processor value if inline_transforms_equality? key }
+    inline_transforms_response_processor default
   end
 
   private
@@ -92,6 +86,27 @@ module InlineTransforms
     return value == self if value.is_a? Proc
 
     value === self
+  end
+
+  # We want to pass fallback values through as-is **except for `Proc`s**,
+  # which we must resolve by passing `self` _or not_, as dictated by its arity.
+  #
+  # @param response_value [Object]
+  #   The `then`, `else`, or matching transform value from one of the above.
+  #
+  # @return [Object]
+  #   The given `response_value`, unless it's a `Proc`, in which case we want to resolve it first.
+  #
+  # @raise [ArgumentError]
+  #
+  def inline_transforms_response_processor(response_value)
+    return response_value unless response_value.is_a? Proc
+
+    case response_value.arity
+    when 0 then response_value.call
+    when 1, -1 then response_value.call self
+    else raise ArgumentError, 'fallback Proc must be of arity 0 or 1'
+    end
   end
 
   # rubocop:enable Style/CaseEquality

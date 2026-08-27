@@ -22,12 +22,23 @@ RSpec.describe Object do
       end
     end
 
-    it %(`call`s the `else` param before use if it's a Proc) do
-      @rand_value = rand 1..10000
-      replacement_proc = -> { @rand_value }
+    describe %(`call`s the `else` param before use if it's a Proc) do
+      it 'with no params if 0-arity' do
+        @rand_value = rand 1..10000
+        replacement_proc = -> { @rand_value }
 
-      test_values.each do |value|
-        expect(value.only_if(safe_bad_value, else: replacement_proc)).to eq @rand_value
+        test_values.each do |value|
+          expect(value.only_if(safe_bad_value, else: replacement_proc)).to eq @rand_value
+        end
+      end
+
+      it 'with the object as a param params if 1-arity' do
+        @rand_value = rand 1..10000
+        replacement_proc = ->(_original_value) { @rand_value }
+
+        test_values.each do |value|
+          expect(value.only_if(safe_bad_value, else: replacement_proc)).to eq @rand_value
+        end
       end
     end
   end
@@ -65,12 +76,23 @@ RSpec.describe Object do
       end
     end
 
-    it %(`call`s the `then` param before use if it's a Proc) do
-      @rand_value = rand 1..10000
-      replacement_proc = -> { @rand_value }
+    describe %(`call`s the `then` param before use if it's a Proc) do
+      it 'with no params if 0-arity' do
+        @rand_value = rand 1..10000
+        replacement_proc = -> { @rand_value }
 
-      test_values.each do |value|
-        expect(value.unless(value, then: replacement_proc)).to eq @rand_value
+        test_values.each do |value|
+          expect(value.unless(value, then: replacement_proc)).to eq @rand_value
+        end
+      end
+
+      it 'with the object as a param params if 1-arity' do
+        @rand_value = rand 1..10000
+        replacement_proc = ->(_original_value) { @rand_value }
+
+        test_values.each do |value|
+          expect(value.unless(value, then: replacement_proc)).to eq @rand_value
+        end
       end
     end
   end
@@ -106,11 +128,20 @@ RSpec.describe Object do
       expect(proc_value.transform(proc_value => replacement_value, else: else_value)).to eq replacement_value
     end
 
-    it %(`call`s a transformed value before use if it's a Proc) do
-      @rand_value = rand 1..10000
-      replacement_proc = -> { @rand_value }
+    describe %(`call`s a transformed value before use if it's a Proc) do
+      it 'with no params if 0-arity' do
+        @rand_value = rand 1..10000
+        replacement_proc = -> { @rand_value }
 
-      expect(value.transform(value => replacement_proc)).to eq @rand_value
+        expect(value.transform(value => replacement_proc)).to eq @rand_value
+      end
+
+      it 'with the object as a param params if 1-arity' do
+        @rand_value = rand 1..10000
+        replacement_proc = ->(_original_value) { @rand_value }
+
+        expect(value.transform(value => replacement_proc)).to eq @rand_value
+      end
     end
   end
 end

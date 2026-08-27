@@ -91,6 +91,9 @@ final_value = original_value.transform true   => 'success',
 `only_if` lets you specify a "good" value and an `else` replacement.
 
 - If your `else` replacement is a `Proc`, it is resolved (via `call`) before being returned.
+  - If it has arity 0, it is `call`ed with no params.
+  - If it has arity 1, it is `call`ed with the original value.
+  - If it has arity -1 (a `lambda` with optional param), it is `call`ed with the original value.
 - This method uses **case comparison** (`===`), so you can check for range inclusion or class.
 
 ```ruby
@@ -105,6 +108,9 @@ final = value.only_if good_value, else: -> { some_method_call with_params }
 `unless` lets you specify a "bad" value and a `then` replacement.
 
 - If your `then` replacement is a `Proc`, it is resolved (via `call`) before being returned.
+  - If it has arity 0, it is `call`ed with no params.
+  - If it has arity 1, it is `call`ed with the original value.
+  - If it has arity -1 (a `lambda` with optional param), it is `call`ed with the original value.
 - This method uses **case comparison** (`===`), so you can check for range inclusion or class.
 
 ```ruby
@@ -119,6 +125,9 @@ final = value.unless bad_value, then: -> { some_method_call with_params }
 `transform` lets you specify a transformation hash and will return the value for the first matching key, or (if no matching key is found) the `:else` value.
 
 - Any `Proc` values in the transform hash are resolved (via `call`) before being returned.
+  - Values with arity 0 are `call`ed with no params.
+  - Values with arity 1 are `call`ed with the original value.
+  - Values with arity -1 (`lambda`s with an optional param) are `call`ed with the original value.
 - This method uses **case comparison** (`===`), so range and class keys work as you expect.
 
 ```ruby
