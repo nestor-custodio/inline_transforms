@@ -114,7 +114,7 @@
         <dt id="VERSION-constant" class="">VERSION =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0.2.0</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0.3.0</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
     </dl>
   
@@ -292,10 +292,7 @@
 27
 28
 29
-30
-31
-32
-33</pre>
+30</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/inline_transforms.rb', line 26</span>
@@ -303,10 +300,7 @@
 <span class='kw'>def</span> <span class='id identifier rubyid_only_if'>only_if</span><span class='lparen'>(</span><span class='id identifier rubyid_good_value'>good_value</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_inline_transforms_equality?'>inline_transforms_equality?</span> <span class='id identifier rubyid_good_value'>good_value</span>
 
-  <span class='id identifier rubyid_alt_value'>alt_value</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:else</span><span class='rbracket'>]</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_alt_value'>alt_value</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span> <span class='kw'>if</span> <span class='id identifier rubyid_alt_value'>alt_value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Proc</span>
-
-  <span class='id identifier rubyid_alt_value'>alt_value</span>
+  <span class='id identifier rubyid_inline_transforms_response_processor'>inline_transforms_response_processor</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:else</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -391,21 +385,21 @@ corresponding hash value is returned. If no matching hash key is found, this ret
       <pre class="lines">
 
 
-74
-75
-76
-77
-78
-79</pre>
+68
+69
+70
+71
+72
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/inline_transforms.rb', line 74</span>
+      <pre class="code"><span class="info file"># File 'lib/inline_transforms.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_transform'>transform</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_default'>default</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span> <span class='symbol'>:else</span>
 
-  <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span> <span class='kw'>return</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_unless'>unless</span> <span class='const'>Proc</span><span class='comma'>,</span> <span class='label'>then:</span> <span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_inline_transforms_equality?'>inline_transforms_equality?</span> <span class='id identifier rubyid_key'>key</span> <span class='rbrace'>}</span>
-  <span class='id identifier rubyid_default'>default</span>
+  <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span> <span class='kw'>return</span> <span class='id identifier rubyid_inline_transforms_response_processor'>inline_transforms_response_processor</span> <span class='id identifier rubyid_value'>value</span> <span class='kw'>if</span> <span class='id identifier rubyid_inline_transforms_equality?'>inline_transforms_equality?</span> <span class='id identifier rubyid_key'>key</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_inline_transforms_response_processor'>inline_transforms_response_processor</span> <span class='id identifier rubyid_default'>default</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -491,25 +485,19 @@ corresponding hash value is returned. If no matching hash key is found, this ret
       <pre class="lines">
 
 
+47
+48
+49
 50
-51
-52
-53
-54
-55
-56
-57</pre>
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/inline_transforms.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/inline_transforms.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='kw'>unless</span><span class='lparen'>(</span><span class='id identifier rubyid_bad_value'>bad_value</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>unless</span> <span class='id identifier rubyid_inline_transforms_equality?'>inline_transforms_equality?</span> <span class='id identifier rubyid_bad_value'>bad_value</span>
 
-  <span class='id identifier rubyid_alt_value'>alt_value</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:then</span><span class='rbracket'>]</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_alt_value'>alt_value</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span> <span class='kw'>if</span> <span class='id identifier rubyid_alt_value'>alt_value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Proc</span>
-
-  <span class='id identifier rubyid_alt_value'>alt_value</span>
+  <span class='id identifier rubyid_inline_transforms_response_processor'>inline_transforms_response_processor</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:then</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -521,7 +509,7 @@ corresponding hash value is returned. If no matching hash key is found, this ret
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 25 16:11:47 2026 by
+  Generated on Wed Aug 26 23:26:19 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-3.4.8).
 </div>

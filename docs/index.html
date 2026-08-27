@@ -142,7 +142,13 @@
 <h3 id="Object_only_if">Object#only_if</h3>
 <p><code>only_if</code> lets you specify a &quot;good&quot; value and an <code>else</code> replacement.</p>
 <ul>
-<li>If your <code>else</code> replacement is a <code>Proc</code>, it is resolved (via <code>call</code>) before being returned.</li>
+<li>If your <code>else</code> replacement is a <code>Proc</code>, it is resolved (via <code>call</code>) before being returned.
+<ul>
+<li>If it has arity 0, it is <code>call</code>ed with no params.</li>
+<li>If it has arity 1, it is <code>call</code>ed with the original value.</li>
+<li>If it has arity -1 (a <code>lambda</code> with optional param), it is <code>call</code>ed with the original value.</li>
+</ul>
+</li>
 <li>This method uses <strong>case comparison</strong> (<code>===</code>), so you can check for range inclusion or class.</li>
 </ul>
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_final'>final</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_only_if'>only_if</span> <span class='id identifier rubyid_good_value'>good_value</span><span class='comma'>,</span> <span class='label'>else:</span> <span class='id identifier rubyid_fallback_value'>fallback_value</span>
@@ -152,7 +158,13 @@
 <h3 id="Object_unless">Object#unless</h3>
 <p><code>unless</code> lets you specify a &quot;bad&quot; value and a <code>then</code> replacement.</p>
 <ul>
-<li>If your <code>then</code> replacement is a <code>Proc</code>, it is resolved (via <code>call</code>) before being returned.</li>
+<li>If your <code>then</code> replacement is a <code>Proc</code>, it is resolved (via <code>call</code>) before being returned.
+<ul>
+<li>If it has arity 0, it is <code>call</code>ed with no params.</li>
+<li>If it has arity 1, it is <code>call</code>ed with the original value.</li>
+<li>If it has arity -1 (a <code>lambda</code> with optional param), it is <code>call</code>ed with the original value.</li>
+</ul>
+</li>
 <li>This method uses <strong>case comparison</strong> (<code>===</code>), so you can check for range inclusion or class.</li>
 </ul>
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_final'>final</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_unless'>unless</span> <span class='id identifier rubyid_bad_value'>bad_value</span><span class='comma'>,</span> <span class='label'>then:</span> <span class='id identifier rubyid_fallback_value'>fallback_value</span>
@@ -162,7 +174,13 @@
 <h3 id="Object_transform">Object#transform</h3>
 <p><code>transform</code> lets you specify a transformation hash and will return the value for the first matching key, or (if no matching key is found) the <code>:else</code> value.</p>
 <ul>
-<li>Any <code>Proc</code> values in the transform hash are resolved (via <code>call</code>) before being returned.</li>
+<li>Any <code>Proc</code> values in the transform hash are resolved (via <code>call</code>) before being returned.
+<ul>
+<li>Values with arity 0 are <code>call</code>ed with no params.</li>
+<li>Values with arity 1 are <code>call</code>ed with the original value.</li>
+<li>Values with arity -1 (<code>lambda</code>s with an optional param) are <code>call</code>ed with the original value.</li>
+</ul>
+</li>
 <li>This method uses <strong>case comparison</strong> (<code>===</code>), so range and class keys work as you expect.</li>
 </ul>
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_final'>final</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_transform'>transform</span> <span class='id identifier rubyid_key_1'>key_1</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_value_1'>value_1</span><span class='comma'>,</span>
@@ -229,7 +247,7 @@
 <p>The <code>inline_transforms</code> gem is available as open source under the terms of the <a href="https://tldrlegal.com/license/mit-license">MIT License</a>.</p></div></div>
 
       <div id="footer">
-  Generated on Tue Aug 25 16:11:47 2026 by
+  Generated on Wed Aug 26 23:26:19 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-3.4.8).
 </div>
